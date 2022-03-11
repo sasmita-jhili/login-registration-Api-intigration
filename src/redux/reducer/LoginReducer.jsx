@@ -1,19 +1,28 @@
 const initialState = {
-  email: '',
-  password: '',
+  data: [],
+  loading: false,
 }
 
 export const LoginReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'USER_LOGIN':
-      console.log(action.payload.data)
-      console.log(action.payload.roleId)
+    case 'USER_LOGIN_REQUEST':
       return {
         ...state,
-        initialState: action.payload.data,
-        roleId: action.payload.roleId,
+        loading: true,
       }
-
+    case 'USER_LOGIN_SUCCESS':
+      return {
+        ...state,
+        data: action.payload.data,
+        roleId: action.payload.roleId,
+        loading: false,
+      }
+    case 'USER_LOGIN_FAIL':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      }
     default:
       return state
   }

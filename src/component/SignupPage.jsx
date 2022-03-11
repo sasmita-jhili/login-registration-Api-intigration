@@ -1,4 +1,5 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import {
   Grid,
   Paper,
@@ -15,29 +16,47 @@ import FormControl from '@material-ui/core/FormControl'
 import FormLabel from '@material-ui/core/FormLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
-// import * as Yup from 'yup'
-
-const Signup = () => {
-  const paperStyle = { padding: 20, width: 300, margin: '0 auto' }
+import { FormHelperText } from '@material-ui/core'
+import * as Yup from 'yup'
+import userRegisterApi from '../redux/action/RegisterAction'
+const Signup = (props) => {
+  const paperStyle = {
+    padding: 20,
+    width: 300,
+    // height: '80vh',
+    margin: '0 auto',
+  }
   const headerStyle = { margin: 0 }
   const avatarStyle = { backgroundColor: '#1bbd7e' }
-  const marginTop = { marginTop: 10 }
+  const marginTop = { marginTop: 20 }
   const initialValues = {
-    name: '',
+    fullname: '',
+    phone: '',
     email: '',
-    phonenumber: '',
     password: '',
-    confirmpassword: '',
+    gender: '',
+    address: '',
+    rolename: props.role,
   }
-  // const validationSchema = Yup.object().shape({
-  //     name: Yup.string().name('please enter name').required("Required"),
-  //     email: Yup.string().email('please enter valid email').required("Required"),
-  //     phonenumber: Yup.string().name('please enter phone number').required("Required"),
-  //     password: Yup.string().required("Required"),
-  //     confirmpassword: Yup.string().required("Required"),
-  // })
+  const dispatch = useDispatch()
+  const validationSchema = Yup.object().shape({
+    fullname: Yup.string().min(3, "It's too short").required('Required'),
+    email: Yup.string().email('Enter valid email').required('Required'),
+    gender: Yup.string()
+      .oneOf(['male', 'female'], 'Required')
+      .required('Required'),
+    phone: Yup.number()
+      .typeError('Enter valid Phone Number')
+      .required('Required'),
+    password: Yup.string()
+      .min(8, 'Password minimum length should be 8')
+      .required('Required'),
+    address: Yup.string().min(3, "It's too short").required('Required'),
+    rolename: Yup.string().min(3, "It's too short").required('Required'),
+  })
   const onSubmit = (values, props) => {
     console.log(values)
+    dispatch(userRegisterApi(values))
     setTimeout(() => {
       props.resetForm()
       props.setSubmitting(false)
@@ -55,7 +74,11 @@ const Signup = () => {
             Please fill this form to create an account !
           </Typography>
         </Grid>
-        <Formik initialValues={initialValues} onSubmit={onSubmit}>
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validationSchema={validationSchema}
+        >
           {(props) => (
             <Form>
               <Field
@@ -64,8 +87,17 @@ const Signup = () => {
                 required
                 label="Name"
                 placeholder="Enter your name"
-                name="name"
+                name="fullname"
                 helperText={<ErrorMessage name="name" />}
+              />
+              <Field
+                as={TextField}
+                fullWidth
+                required
+                label="Phone Number"
+                placeholder="Enter your phone number"
+                name="phone"
+                helperText={<ErrorMessage name="phonenumber" />}
               />
               <Field
                 as={TextField}
@@ -80,33 +112,36 @@ const Signup = () => {
                 as={TextField}
                 fullWidth
                 required
-                label="Phone Number"
-                placeholder="Enter your phone number"
-                name="phonenumber"
-                helperText={<ErrorMessage name="phonenumber" />}
-              />
-              <Field
-                as={TextField}
-                fullWidth
-                required
                 label="Password"
                 placeholder="Enter your password"
                 name="password"
+                type="password"
                 helperText={<ErrorMessage name="password" />}
+              />
+
+              <Field
+                as={TextField}
+                fullWidth
+                required
+                label="Address"
+                placeholder="Address"
+                name="address"
+                helperText={<ErrorMessage name="address" />}
               />
               <Field
                 as={TextField}
                 fullWidth
                 required
-                label="Confirm Password"
-                placeholder="Confirm your password"
-                name="confirmpassword"
-                helperText={<ErrorMessage name="confirmpassword" />}
+                label="Rolename"
+                placeholder="Rolename"
+                name="rolename"
+                helperText={<ErrorMessage name="rolename" />}
               />
 
               <FormControl component="fieldset" style={marginTop}>
                 <FormLabel component="legend">Gender</FormLabel>
-                <RadioGroup
+                <Field
+                  as={RadioGroup}
                   aria-label="gender"
                   name="gender"
                   style={{ display: 'initial' }}
@@ -121,20 +156,24 @@ const Signup = () => {
                     control={<Radio />}
                     label="Male"
                   />
-                </RadioGroup>
+                </Field>
               </FormControl>
-              <FormControlLabel
+              <FormHelperText>
+                <ErrorMessage name="gender" />
+              </FormHelperText>
+              {/* <FormControlLabel
                 control={<Checkbox name="checkedA" />}
                 label="I accept the terms and conditions."
-              />
+              /> */}
               <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 disabled={props.isSubmitting}
                 fullWidth
+                style={marginTop}
               >
-                {props.isSubmitting ? 'Loading' : 'Sign in'}
+                {props.isSubmitting ? 'Loading' : 'Sign up'}
               </Button>
             </Form>
           )}

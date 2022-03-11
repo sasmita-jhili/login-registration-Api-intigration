@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import Loader from './Loader'
 import {
   Grid,
   Paper,
@@ -20,11 +21,8 @@ import { userLoginApi } from '../redux/action/LoginAction'
 
 const Login = ({ handleChange }) => {
   const dispatch = useDispatch()
-  const selector = useSelector((state) => state.LoginReducer.initialState)
-  console.log(selector)
-  const history = useHistory()
-  const [loading, setLoading] = useState('')
-  const [error, setError] = useState('')
+  const Loading = useSelector((state) => state.LoginReducer.loading)
+
   const paperStyle = {
     padding: 20,
     height: '73vh',
@@ -44,7 +42,7 @@ const Login = ({ handleChange }) => {
 
   const onSubmit = (values, props) => {
     console.log(values)
-    dispatch(userLoginApi(values, history, setLoading, setError))
+    dispatch(userLoginApi(values))
     setTimeout(() => {
       props.resetForm()
       props.setSubmitting(false)
@@ -67,8 +65,9 @@ const Login = ({ handleChange }) => {
         >
           {(props) => (
             <Form>
-              {loading && <div className="spinner-border text-primay" />}
-              {error && <div className="alert alert-danger">{error}</div>}
+              {Loading && <Loader />}
+
+              {/* {error && <div className="alert alert-danger">{error}</div>} */}
               <Field
                 as={TextField}
                 label="email"
